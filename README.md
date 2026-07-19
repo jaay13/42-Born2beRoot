@@ -646,9 +646,10 @@ fix is snapshots.
 
 - Booting the VM writes to the disk, so the `.vdi` hash changes immediately.
 - A **snapshot** freezes the current disk state and sends new writes to a
-  separate file. When you **delete/restore** the snapshot afterwards, the base
+  separate file. When you **restore** the snapshot afterwards, the base
   `.vdi` returns to exactly its pre-boot state → the original hash matches
-  again.
+  again. **Important** restore the snapshot at first **BEFORE** deleting the snapshot. 
+  Otherwise the changes of it get written to the disk hence changing the hash.
 - So: compute the hash from a fully shut-down VM, then only ever run it from
   snapshots, deleting them after each session to keep the base disk intact.
 
@@ -695,9 +696,12 @@ The subject requires each defense to **start with no snapshots**. So:
    changes land in the snapshot file, not the base `.vdi`.
 4. Do the whole evaluation (logins, live user creation, monitoring, fail2ban,
    etc.) from the running snapshot.
-5. **At the end, delete/discard the snapshot.** The base `.vdi` reverts to its
-   pre-boot state, so its hash still matches `signature.txt` — ready for the
+5. **Shut down the VM normally.**
+6. **RESTORE the Snapshot at first, BEFORE deleting it.**
+    Otherwise the changes of it get written to the disk hence changing the hash.
+    The base `.vdi` reverts now its re-boot state, so its hash still matches `signature.txt` — ready for the
    next evaluation.
+7. **At the end, delete/discard the snapshot.** 
 
 ### Golden rules
 
